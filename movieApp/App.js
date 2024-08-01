@@ -1,42 +1,68 @@
-import 'react-native-gesture-handler';
-import React from 'react';
-import { Text, Image, ImageBackground, View, StyleSheet, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Card from './src/components/Card';
 import users from './assets/data/users';
 
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, useDerivedValue, interpolate } from 'react-native-reanimated';
+import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
+
+const ROTATION = 60;
 
 const App = () => {
-  const sharedValue = useSharedValue(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [nextIndex, setNextIndex] = useState(currentIndex + 1);
+
+  const currentProfile = users[currentIndex];
+  const nextProfile = users[nextIndex];
+
+  const { width: screenWidth } = useWindowDimensions();
+  const hiddenTranslateX = 2 * screenWidth;
+  const translateX = useSharedValue(0);
+
+  const rotate = useDerivedValue(() =>
+    interpolate(translateX.value, [0, hiddenTranslateX], [0, ROTATION]) + 'deg'
+  );
 
   const cardStyle = useAnimatedStyle(() => ({
-    transform: [{
-      translateX: sharedValue.value * 500 - 250,
-    }]
+    transform: [
+      { translateX: translateX.value },
+      { rotate: rotate.value },
+    ],
   }));
 
-  const panGesture = Gesture.Pan()
-    .onStart(() => {
-      console.warn("Touch Start");
-    })
-    .onUpdate((event) => {
-      console.log("Touch x: ", event.translationX);
-      sharedValue.value = withSpring(event.translationX / 500 + 0.5);
-    })
-    .onEnd(() => {
-      console.warn("Touch end");
-      sharedValue.value = withSpring(1); // Reset to original position
-    });
+  const nextcardStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: interpolate(
+          translateX.value,
+          [-hiddenTranslateX, 0, hiddenTranslateX],
+          [1, 0.8, 1],
+        ),
+      },
+    ],
+  }));
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.pageContainer}>
-        <GestureDetector gesture={panGesture}>
-          <Animated.View style={[styles.animatedCard, cardStyle]}>
-            <Card user={users[2]} />
+        <View style={styles.nextCardContainer}>
+          <Animated.View style={[styles.animatedCard, nextcardStyle]}>
+            <Card user={nextProfile} />
           </Animated.View>
-        </GestureDetector>
+        </View>
+
+        <PanGestureHandler
+          onGestureEvent={({ nativeEvent }) => {
+            translateX.value = nativeEvent.translationX;
+          }}
+          onEnded={() => {
+            // Handle gesture end
+          }}
+        >
+          <Animated.View style={[styles.animatedCard, cardStyle]}>
+            <Card user={currentProfile} />
+          </Animated.View>
+        </PanGestureHandler>
       </View>
     </GestureHandlerRootView>
   );
@@ -46,13 +72,19 @@ const styles = StyleSheet.create({
   pageContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
   },
   animatedCard: {
     width: '100%',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
+  nextCardContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default App;
