@@ -3,10 +3,11 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Card from './src/components/Card';
 import users from './assets/data/users';
 
-import Animated, { useSharedValue, useAnimatedStyle, useDerivedValue, interpolate } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, useDerivedValue, interpolate, withSpring } from 'react-native-reanimated';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 
 const ROTATION = 60;
+const SWIPE_VELOCITY = 600;
 
 const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,7 +31,7 @@ const App = () => {
     ],
   }));
 
-  const nextcardStyle = useAnimatedStyle(() => ({
+  const nextCardStyle = useAnimatedStyle(() => ({
     transform: [
       {
         scale: interpolate(
@@ -40,13 +41,18 @@ const App = () => {
         ),
       },
     ],
+    opacity: interpolate(
+      translateX.value,
+      [-hiddenTranslateX, 0, hiddenTranslateX],
+      [1, 0.6, 1],
+    ),
   }));
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.pageContainer}>
         <View style={styles.nextCardContainer}>
-          <Animated.View style={[styles.animatedCard, nextcardStyle]}>
+          <Animated.View style={[styles.animatedCard, nextCardStyle]}>
             <Card user={nextProfile} />
           </Animated.View>
         </View>
@@ -55,8 +61,13 @@ const App = () => {
           onGestureEvent={({ nativeEvent }) => {
             translateX.value = nativeEvent.translationX;
           }}
-          onEnded={() => {
-            // Handle gesture end
+          onEnded={({ nativeEvent }) => {
+            if (Math.abs(nativeEvent.velocityX) < SWIPE_VELOCITY) {
+              translateX.value = withSpring(0);
+            } else {
+              // Handle swiping the card out
+              translateX.value = withSpring(hiddenTranslateX * Math.sign(nativeEvent.velocityX));
+            }
           }}
         >
           <Animated.View style={[styles.animatedCard, cardStyle]}>
