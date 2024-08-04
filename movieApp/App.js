@@ -50,6 +50,23 @@ const App = () => {
     ),
   }));
 
+  const likeStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateX.value,
+      [0,hiddenTranslateX/5],
+      [0, 1],
+    ),
+
+  }));
+  const dislikeStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateX.value,
+      [0,-hiddenTranslateX/5],
+      [0, 1],
+    ),
+
+  }));
+
 
   useEffect(() => {
     translateX.value = 0; 
@@ -85,8 +102,8 @@ const App = () => {
          <Animated.View style={[styles.animatedCard, cardStyle]}>
       {currentProfile && (
        <>
-      <Image source={Like} style={[styles.like, {right: 10}]} resizeMethod = "contain"/>
-      <Image source={Dislike} style={[styles.like, {left:10}]} resizeMethod = "contain"/>
+      <Animated.Image source={Like} style={[styles.like, {left: 10}, likeStyle]} resizeMethod = "contain"/>
+      <Animated.Image source={Dislike} style={[styles.like, {right:10}, dislikeStyle]} resizeMethod = "contain"/>
       <Card user={currentProfile} />
     </>
   )}
@@ -109,7 +126,7 @@ const styles = StyleSheet.create({
   animatedCard: {
     width: '90%',
     height: '70%',
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -119,8 +136,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   like: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     position: "absolute", 
     top: 10,
     zIndex: 1,
