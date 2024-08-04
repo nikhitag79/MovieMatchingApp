@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, useWindowDimensions, Image } from 'react-native';
 import Card from './src/components/Card';
 import users from './assets/data/users';
+import Like from './assets/yes.jpg';
+import Dislike from './assets/no.webp';
 
-import Animated, { useSharedValue, useAnimatedStyle, useDerivedValue, interpolate, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, useDerivedValue, interpolate, withSpring, runOnJS} from 'react-native-reanimated';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 
 const ROTATION = 60;
@@ -48,15 +50,23 @@ const App = () => {
     ),
   }));
 
+
+  useEffect(() => {
+    translateX.value = 0; 
+    setNextIndex(currentIndex + 1);}, [currentIndex]
+);
+
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.pageContainer}>
+        {nextProfile && (
         <View style={styles.nextCardContainer}>
           <Animated.View style={[styles.animatedCard, nextCardStyle]}>
             <Card user={nextProfile} />
           </Animated.View>
         </View>
-
+        )}
         <PanGestureHandler
           onGestureEvent={({ nativeEvent }) => {
             translateX.value = nativeEvent.translationX;
@@ -67,13 +77,24 @@ const App = () => {
             } else {
               // Handle swiping the card out
               translateX.value = withSpring(hiddenTranslateX * Math.sign(nativeEvent.velocityX));
+              runOnJS(setCurrentIndex)(currentIndex+1);
             }
           }}
         >
-          <Animated.View style={[styles.animatedCard, cardStyle]}>
-            <Card user={currentProfile} />
-          </Animated.View>
+         
+         <Animated.View style={[styles.animatedCard, cardStyle]}>
+      {currentProfile && (
+       <>
+      <Image source={Like} style={[styles.like, {right: 10}]} resizeMethod = "contain"/>
+      <Image source={Dislike} style={[styles.like, {left:10}]} resizeMethod = "contain"/>
+      <Card user={currentProfile} />
+    </>
+  )}
+</Animated.View>
+
+
         </PanGestureHandler>
+
       </View>
     </GestureHandlerRootView>
   );
@@ -86,7 +107,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   animatedCard: {
-    width: '100%',
+    width: '90%',
+    height: '70%',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -96,6 +118,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  like: {
+    width: 150,
+    height: 150,
+    position: "absolute", 
+    top: 10,
+    zIndex: 1,
+
+  }
 });
 
 export default App;
