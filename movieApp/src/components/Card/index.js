@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     },
     card:{
       width: '100%', 
-      // backgroundColor: 'red',
+      backgroundColor: '#fefefe',
       height: "100%",
       borderRadius:10,
       shadowColor: '#000',
