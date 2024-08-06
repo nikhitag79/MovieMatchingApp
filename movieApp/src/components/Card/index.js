@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow:'hidden',
         justifyContent: 'flex-end',
+
         
     },
     card:{
@@ -38,8 +39,7 @@ const styles = StyleSheet.create({
         height:5,
       },
       shadowOpacity:0.36,
-      shadowRadius: 6.68,
-  
+      shadowRadius: 6.68,  
     },
     name:{
       fontSize:30,

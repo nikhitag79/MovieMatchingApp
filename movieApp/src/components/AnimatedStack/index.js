@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
   root: {
     justifyContent: 'center',
     alignItems: 'center',
+    height: '100%',
     width: '100%',
     flex: 1,
   },
@@ -121,11 +122,15 @@ const styles = StyleSheet.create({
     height: '70%',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+
   },
   nextCardContainer: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
+
+    
   },
   like: {
     width: 100,
