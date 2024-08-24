@@ -40,7 +40,7 @@ const App = () => {
             <FontAwesome name = "user" size = {30} color = {color}/>
         </View>
         
-      <HomeScreen/>
+      { activeScreen === 'HOME' && <HomeScreen/> } 
       </View>
       </SafeAreaView>
      
