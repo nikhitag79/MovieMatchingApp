@@ -5,9 +5,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HomeScreen from './src/screens/HomeScreens';
-
+import ProfileScreen from './src/screens/ProfileScreen';
 import { Amplify } from 'aws-amplify';
-import { withAuthenticator } from 'aws-amplify-react-native'; // Import the withAuthenticator HOC
+import { withAuthenticator } from 'aws-amplify-react-native'; 
 import amplifyconfig from './src/amplifyconfiguration.json';
 Amplify.configure(amplifyconfig);
 
@@ -27,10 +27,14 @@ const App = () => {
           <Pressable onPress={() => setActiveScreen('CHAT')}>
             <Ionicons name='chatbubbles' size={30} color={activeScreen === 'CHAT' ? activeColor : color} />
           </Pressable>
-          <FontAwesome name="user" size={30} color={color} />
+          <Pressable onPress={() => setActiveScreen('PROFILE')}>
+            <FontAwesome name="user" size={30} color={activeScreen === 'PROFILE' ? activeColor : color} />
+          </Pressable>
+          
         </View>
         
         {activeScreen === 'HOME' && <HomeScreen />}
+        {activeScreen === 'PROFILE' && <ProfileScreen />}
       </View>
     </SafeAreaView>
   );
@@ -53,4 +57,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withAuthenticator(App); // Wrap your App with the withAuthenticator HOC
+export default withAuthenticator(App); 
